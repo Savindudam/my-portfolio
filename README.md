@@ -15,5 +15,5 @@ so to make this work I have used the following types of technologies in my site,
    4. javascript
 
 And it also have the links of some projects done by me in various languages like python, c++ and bash.
-![alt text](image.png)
+![alt text](image-1.png)
 
