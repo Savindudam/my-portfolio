@@ -3,393 +3,637 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Savindu Damsara</title>
+<title>Savindu Damsara — Competitive Programmer &amp; Security Learner</title>
+<meta name="description" content="Savindu Damsara — competitive programmer on the IOI track, building small security and dev tools between contests.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0b0a08;
-  --panel:#141210;
-  --panel2:#191612;
-  --rule:#2a2620;
-  --ink:#f4ead9;
-  --ink-dim:#a89a80;
-  --ink-faint:#5f574a;
-  --amber:#ffb000;
-  --amber-dim:#7a5200;
-  --mono:'JetBrains Mono',monospace;
-  --sans:'Inter',sans-serif;
+  --bg:#0a0d0a;
+  --bg-soft:#0e120e;
+  --panel:#12160f;
+  --panel2:#161b13;
+  --rule:#242b21;
+  --rule-soft:#1a1f18;
+  --ink:#edf2e8;
+  --ink-dim:#9aa694;
+  --ink-faint:#59614f;
+  --amber:#ffb300;
+  --amber-dim:#8a5c00;
+  --amber-wash:rgba(255,179,0,.08);
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --sans:'IBM Plex Sans',system-ui,sans-serif;
+  --bar-h:52px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
 body{
   background:var(--bg);
   color:var(--ink);
   font-family:var(--sans);
   font-weight:300;
   overflow-x:hidden;
+  padding-bottom:var(--bar-h);
+  line-height:1.6;
 }
 body::before{
   content:'';
   position:fixed;inset:0;
-  background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,176,0,.012) 2px,rgba(255,176,0,.012) 3px);
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,179,0,.012) 2px,rgba(255,179,0,.012) 3px);
   pointer-events:none;z-index:0;
 }
 ::selection{background:var(--amber);color:#100c00}
-::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-thumb{background:var(--rule)}
+img{max-width:100%;display:block}
+a{color:inherit}
 
-nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:1.1rem 3rem;
+.skip-link{
+  position:absolute;left:-999px;top:0;background:var(--amber);color:#100c00;
+  padding:.7rem 1.2rem;font-family:var(--mono);font-size:.8rem;font-weight:700;z-index:1000;
+}
+.skip-link:focus{left:1rem;top:1rem}
+
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+/* ============ TOP BAR (desktop nav) ============ */
+.topbar{
+  position:fixed;top:0;left:0;right:0;z-index:90;
+  padding:1rem clamp(1.2rem,4vw,3rem);
   display:flex;justify-content:space-between;align-items:center;
-  background:rgba(11,10,8,.85);backdrop-filter:blur(10px);
-  border-bottom:1px solid var(--rule);
+  background:rgba(10,13,10,.82);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--rule-soft);
 }
-.logo{font-family:var(--mono);font-weight:700;color:var(--ink);font-size:.95rem}
-.logo span{color:var(--amber)}
-.nav-links{display:flex;gap:2rem;list-style:none}
-.nav-links a{
+.logo{font-family:var(--mono);font-weight:700;color:var(--ink);font-size:.95rem;text-decoration:none}
+.logo b{color:var(--amber);font-weight:700}
+.topbar nav{display:flex;gap:2rem;list-style:none}
+.topbar nav a{
   font-family:var(--mono);font-size:.66rem;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--ink-dim);text-decoration:none;transition:color .15s;
+  color:var(--ink-dim);text-decoration:none;transition:color .15s;padding:.2rem 0;
 }
-.nav-links a:hover{color:var(--amber)}
-@media(max-width:820px){.nav-links{display:none}}
+.topbar nav a:hover{color:var(--amber)}
+@media(max-width:820px){ .topbar nav{display:none} }
 
-section{padding:7rem 3rem;position:relative;z-index:1;border-bottom:1px solid var(--rule)}
+/* ============ SHARED SECTION RHYTHM ============ */
+main{position:relative;z-index:1}
+section{
+  padding:clamp(4rem,9vw,7rem) clamp(1.2rem,5vw,3rem);
+  border-bottom:1px solid var(--rule-soft);
+  scroll-margin-top:70px;
+}
 .eyebrow{
   font-family:var(--mono);font-size:.68rem;color:var(--amber);
-  letter-spacing:2px;margin-bottom:1.2rem;display:flex;align-items:center;gap:.6rem;
+  letter-spacing:2px;margin-bottom:1.4rem;display:flex;align-items:center;gap:.6rem;
 }
 .eyebrow::before{content:'//'}
+.wrap{max-width:1080px;margin:0 auto}
 
-/* ---- HERO / BOOT SEQUENCE ---- */
+/* ============ TERMINAL WINDOW CHROME (signature element) ============ */
+.term{
+  background:var(--panel);
+  border:1px solid var(--rule);
+  border-radius:8px;
+  overflow:hidden;
+}
+.term-bar{
+  display:flex;align-items:center;gap:.5rem;
+  padding:.65rem .9rem;
+  background:var(--panel2);
+  border-bottom:1px solid var(--rule);
+}
+.term-dot{width:9px;height:9px;border-radius:50%;background:var(--rule)}
+.term-dot.r{background:#c9564a}
+.term-dot.y{background:#c9a13b}
+.term-dot.g{background:#4f9d5c}
+.term-path{
+  font-family:var(--mono);font-size:.68rem;color:var(--ink-faint);
+  margin-left:.4rem;
+}
+.term-path .amber{color:var(--amber-dim)}
+.term-body{padding:1.6rem}
+@media(max-width:600px){ .term-body{padding:1.2rem} }
+
+/* ============ HERO ============ */
 #hero{
-  min-height:100vh;display:flex;flex-direction:column;justify-content:center;
-  padding:8rem 3rem 5rem;
+  min-height:100svh;display:flex;flex-direction:column;justify-content:center;
+  padding-top:calc(6rem + 1.5rem);
+  border-bottom:1px solid var(--rule-soft);
 }
 .boot-log{
   font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);
-  line-height:1.9;margin-bottom:2.5rem;min-height:9.5rem;
+  line-height:2;min-height:8.5rem;margin-bottom:1.6rem;
 }
 .boot-log .ok{color:var(--amber-dim)}
+.boot-log .tag{color:var(--ink-dim)}
 .hero-name{
   font-family:var(--mono);font-weight:800;
-  font-size:clamp(2.4rem,7vw,5rem);line-height:1.02;letter-spacing:-1px;
+  font-size:clamp(2.3rem,8.5vw,5.2rem);line-height:1.02;letter-spacing:-1px;
   color:var(--ink);opacity:0;
 }
 .hero-name.show{opacity:1;animation:rise .6s ease forwards}
 .hero-name .amber{color:var(--amber)}
-.cursor{display:inline-block;width:.5em;height:.85em;background:var(--amber);
-  vertical-align:middle;margin-left:.15em;animation:blink 1s step-end infinite}
+.cursor{display:inline-block;width:.48em;height:.8em;background:var(--amber);
+  vertical-align:middle;margin-left:.12em;animation:blink 1s step-end infinite}
+@media (prefers-reduced-motion:reduce){ .cursor{animation:none;opacity:1} }
 @keyframes blink{50%{opacity:0}}
 @keyframes rise{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
 .hero-role{
   font-family:var(--mono);font-size:.85rem;color:var(--ink-dim);
-  margin:1.2rem 0 2.2rem;opacity:0;
+  margin:1.1rem 0 1.8rem;opacity:0;
 }
 .hero-role.show{opacity:1;transition:opacity .5s ease .1s}
-.hero-bio{max-width:560px;font-size:1rem;color:var(--ink-dim);line-height:1.85;margin-bottom:2.5rem;
-  opacity:0}
+.hero-bio{max-width:580px;font-size:clamp(.95rem,2.4vw,1.05rem);color:var(--ink-dim);line-height:1.85;margin-bottom:2.2rem;opacity:0}
 .hero-bio.show{opacity:1;transition:opacity .5s ease .2s}
 .hero-bio strong{color:var(--ink);font-weight:500}
-.hero-links{display:flex;gap:1rem;flex-wrap:wrap;opacity:0}
+.hero-bio .accent{color:var(--amber)}
+.hero-links{display:flex;gap:.9rem;flex-wrap:wrap;opacity:0}
 .hero-links.show{opacity:1;transition:opacity .5s ease .3s}
 .hlink{
   font-family:var(--mono);font-size:.7rem;letter-spacing:1px;text-transform:uppercase;
-  padding:.7rem 1.3rem;border:1px solid var(--rule);color:var(--ink-dim);text-decoration:none;
-  transition:.2s;
+  padding:.75rem 1.3rem;border:1px solid var(--rule);color:var(--ink-dim);text-decoration:none;
+  transition:.2s;display:inline-block;
 }
 .hlink:hover{border-color:var(--amber);color:var(--amber)}
 .hlink.primary{background:var(--amber);color:#100c00;border-color:var(--amber);font-weight:700}
 .hlink.primary:hover{background:#ffc233;color:#100c00}
 
-/* ---- FILE BLOCKS ---- */
-.file-header{
-  font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);
-  border-bottom:1px dashed var(--rule);padding-bottom:.6rem;margin-bottom:2rem;
-  display:flex;justify-content:space-between;
-}
-.file-header .path::before{content:'~/';color:var(--amber-dim)}
-
-#about .about-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:5rem}
+/* ============ ABOUT ============ */
+.about-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(2rem,5vw,4rem)}
+@media(max-width:820px){ .about-grid{grid-template-columns:1fr} }
 .about-copy p{font-size:.95rem;color:var(--ink-dim);line-height:1.95;margin-bottom:1.2rem}
 .about-copy strong{color:var(--ink);font-weight:500}
 .about-copy .amber-text{color:var(--amber)}
-.stat-row{display:flex;flex-direction:column;gap:0}
 .stat{
-  display:flex;justify-content:space-between;padding:1rem 0;border-bottom:1px solid var(--rule);
-  font-family:var(--mono);font-size:.75rem;
+  display:flex;justify-content:space-between;gap:1rem;padding:.9rem 0;border-bottom:1px solid var(--rule);
+  font-family:var(--mono);font-size:.74rem;
 }
 .stat span:first-child{color:var(--ink-faint)}
-.stat span:last-child{color:var(--ink)}
+.stat span:last-child{color:var(--ink);text-align:right}
 
-/* ---- SKILLS ---- */
-#skills{background:var(--panel)}
-.skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--rule);border-left:1px solid var(--rule)}
-.skill-col{padding:2rem;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule)}
-.skill-col h3{font-family:var(--mono);font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--amber);margin-bottom:1.3rem}
-.skill-col ul{list-style:none;display:flex;flex-direction:column;gap:.65rem}
-.skill-col li{font-size:.85rem;color:var(--ink-dim);display:flex;align-items:center;gap:.6rem}
-.skill-col li::before{content:'\2192';color:var(--ink-faint);font-family:var(--mono)}
-@media(max-width:820px){.skill-grid{grid-template-columns:1fr}}
+/* ============ SKILLS (tree listing) ============ */
+.tree{font-family:var(--mono);font-size:.82rem;line-height:2;color:var(--ink-dim);white-space:pre;overflow-x:auto}
+.tree .dir{color:var(--amber)}
+.tree .leaf{color:var(--ink-dim)}
+.tree .comment{color:var(--ink-faint)}
+@media(max-width:480px){ .tree{font-size:.72rem} }
 
-/* ---- PROJECTS ---- */
-.proj-list{display:flex;flex-direction:column}
-.prow{
-  display:grid;grid-template-columns:3rem 1fr 140px auto;gap:1.5rem;align-items:start;
-  padding:1.8rem 0;border-bottom:1px solid var(--rule);text-decoration:none;color:inherit;
-  transition:.15s;
+/* ============ PROJECTS ============ */
+.proj-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.1rem;
 }
-.prow:first-child{border-top:1px solid var(--rule)}
-.prow:hover{background:var(--panel2);padding-left:.8rem;padding-right:.8rem;margin:0 -0.8rem}
-.prow-num{font-family:var(--mono);font-size:.65rem;color:var(--ink-faint);padding-top:.25rem}
-.prow-name{font-family:var(--mono);font-weight:700;font-size:1.05rem;color:var(--ink);margin-bottom:.4rem}
-.prow-desc{font-size:.82rem;color:var(--ink-dim);line-height:1.7;max-width:480px}
-.prow-lang{font-family:var(--mono);font-size:.65rem;color:var(--amber);padding-top:.3rem;text-transform:uppercase}
-.prow-arr{font-family:var(--mono);color:var(--ink-faint);padding-top:.25rem;transition:.15s}
-.prow:hover .prow-arr{color:var(--amber);transform:translate(3px,-3px)}
-@media(max-width:820px){.prow{grid-template-columns:2rem 1fr auto}.prow-lang{display:none}}
+.pcard{
+  background:var(--panel);border:1px solid var(--rule);border-radius:8px;overflow:hidden;
+  text-decoration:none;color:inherit;display:flex;flex-direction:column;
+  transition:border-color .15s, transform .15s;
+}
+.pcard:hover{border-color:var(--amber-dim);transform:translateY(-2px)}
+.pcard-bar{
+  display:flex;align-items:center;gap:.5rem;padding:.6rem .8rem;
+  background:var(--panel2);border-bottom:1px solid var(--rule);
+}
+.pcard-file{font-family:var(--mono);font-size:.66rem;color:var(--ink-faint)}
+.pcard-body{padding:1.2rem 1.2rem 1.4rem;display:flex;flex-direction:column;gap:.7rem;flex:1}
+.pcard-name{font-family:var(--mono);font-weight:700;font-size:1rem;color:var(--ink)}
+.pcard-desc{font-size:.83rem;color:var(--ink-dim);line-height:1.7;flex:1}
+.pcard-foot{display:flex;justify-content:space-between;align-items:center;margin-top:.3rem}
+.pcard-lang{font-family:var(--mono);font-size:.62rem;color:var(--amber);text-transform:uppercase;letter-spacing:.5px}
+.pcard-star{font-family:var(--mono);font-size:.62rem;color:var(--ink-faint)}
+.pcard-arr{font-family:var(--mono);color:var(--ink-faint);transition:.15s}
+.pcard:hover .pcard-arr{color:var(--amber);transform:translate(2px,-2px)}
 
-/* ---- DUAL PATH ---- */
-#path{background:var(--panel)}
-.path-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule)}
-.path-col{padding:2.5rem}
+/* ============ DUAL PATH ============ */
+#path{background:var(--bg-soft)}
+.path-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.path-col{padding:clamp(1.6rem,4vw,2.5rem)}
 .path-col + .path-col{border-left:1px solid var(--rule)}
-.path-col h3{font-family:var(--mono);font-size:.85rem;color:var(--amber);margin-bottom:.4rem;letter-spacing:1px}
-.path-col .sub{font-family:var(--mono);font-size:.65rem;color:var(--ink-faint);margin-bottom:1.6rem;text-transform:uppercase;letter-spacing:1px}
+.path-col h3{font-family:var(--mono);font-size:.85rem;color:var(--amber);margin-bottom:.35rem;letter-spacing:1px}
+.path-col .sub{font-family:var(--mono);font-size:.63rem;color:var(--ink-faint);margin-bottom:1.5rem;text-transform:uppercase;letter-spacing:1px}
 .path-col ol{list-style:none;counter-reset:step;display:flex;flex-direction:column;gap:.9rem}
 .path-col li{counter-increment:step;font-size:.85rem;color:var(--ink-dim);display:flex;gap:.8rem;line-height:1.6}
-.path-col li::before{content:counter(step,decimal-leading-zero);font-family:var(--mono);color:var(--ink-faint);font-size:.7rem;padding-top:.15rem;flex-shrink:0}
-@media(max-width:820px){.path-grid{grid-template-columns:1fr}.path-col + .path-col{border-left:none;border-top:1px solid var(--rule)}}
+.path-col li::before{content:counter(step,decimal-leading-zero);font-family:var(--mono);color:var(--ink-faint);font-size:.68rem;padding-top:.15rem;flex-shrink:0}
+@media(max-width:820px){ .path-grid{grid-template-columns:1fr} .path-col + .path-col{border-left:none;border-top:1px solid var(--rule)} }
 
-/* ---- CONTACT ---- */
-#contact .connect-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
-.connect-lead{font-family:var(--mono);font-weight:700;font-size:1.6rem;line-height:1.4;color:var(--ink);margin-bottom:1rem}
+/* ============ CONTACT ============ */
+.connect-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,5vw,4rem);align-items:start}
+@media(max-width:820px){ .connect-grid{grid-template-columns:1fr} }
+.prompt-line{font-family:var(--mono);font-size:.8rem;color:var(--ink-faint);margin-bottom:.8rem}
+.prompt-line .amber{color:var(--amber)}
+.connect-lead{font-family:var(--mono);font-weight:700;font-size:clamp(1.25rem,3.5vw,1.6rem);line-height:1.45;color:var(--ink);margin-bottom:1rem}
 .connect-lead .amber{color:var(--amber)}
 .connect-sub{font-size:.88rem;color:var(--ink-dim);line-height:1.85}
-.slinks{display:flex;flex-direction:column;gap:1px;background:var(--rule)}
-.slink{display:flex;align-items:center;justify-content:space-between;padding:1.3rem 1.5rem;background:var(--bg);text-decoration:none;transition:.15s}
+.slinks{display:flex;flex-direction:column;gap:1px;background:var(--rule);border-radius:8px;overflow:hidden}
+.slink{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;background:var(--bg);text-decoration:none;transition:.15s}
 .slink:hover{background:var(--panel2)}
 .slink-name{font-family:var(--mono);font-weight:700;color:var(--ink);font-size:.9rem}
 .slink-handle{font-family:var(--mono);font-size:.65rem;color:var(--ink-faint);margin-top:.2rem;display:block}
 .slink-arr{font-family:var(--mono);color:var(--ink-faint)}
 .slink:hover .slink-arr{color:var(--amber)}
 
-footer{padding:1.6rem 3rem;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:.65rem;color:var(--ink-faint)}
+footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-between;align-items:center;
+  font-family:var(--mono);font-size:.63rem;color:var(--ink-faint);flex-wrap:wrap;gap:.5rem}
 .ft-live{display:flex;align-items:center;gap:.5rem}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--amber);animation:pulse 2.2s ease infinite}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--amber)}
+@media (prefers-reduced-motion:no-preference){ .dot{animation:pulse 2.2s ease infinite} }
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* ============ TMUX-STYLE STATUS BAR (mobile nav, signature element #2) ============ */
+.tmux-bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:95;
+  display:none;
+  align-items:stretch;
+  background:var(--panel2);
+  border-top:1px solid var(--rule);
+  font-family:var(--mono);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.tmux-session{
+  display:flex;align-items:center;gap:.4rem;
+  padding:0 .8rem;font-size:.62rem;color:var(--amber);
+  border-right:1px solid var(--rule);white-space:nowrap;flex-shrink:0;
+}
+.tmux-tabs{display:flex;overflow-x:auto;flex:1;scrollbar-width:none}
+.tmux-tabs::-webkit-scrollbar{display:none}
+.tmux-tab{
+  flex-shrink:0;display:flex;align-items:center;gap:.35rem;
+  padding:0 .9rem;height:var(--bar-h);
+  font-size:.66rem;color:var(--ink-faint);text-decoration:none;white-space:nowrap;
+  border-right:1px solid var(--rule-soft);
+}
+.tmux-tab b{color:var(--ink-faint);font-weight:600}
+.tmux-tab.active{color:var(--amber);background:var(--amber-wash)}
+.tmux-tab.active b{color:var(--amber)}
+@media(max-width:820px){ .tmux-bar{display:flex} }
+@media(min-width:821px){ body{padding-bottom:0} }
 
 .fade{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
 .fade.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .fade{opacity:1;transform:none;transition:none}
+  .hero-name,.hero-role,.hero-bio,.hero-links{opacity:1 !important;animation:none !important;transition:none !important}
+}
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="logo">&lt;<span>SD</span> /&gt;</div>
-  <ul class="nav-links">
-    <li><a href="#about">about</a></li>
-    <li><a href="#skills">skills</a></li>
-    <li><a href="#projects">projects</a></li>
-    <li><a href="#path">path</a></li>
-    <li><a href="#contact">contact</a></li>
-  </ul>
-</nav>
+<a class="skip-link" href="#main">Skip to content</a>
 
-<section id="hero">
-  <div class="boot-log" id="bootLog"></div>
-  <h1 class="hero-name" id="heroName">Savindu <span class="amber">Damsara</span><span class="cursor"></span></h1>
-  <div class="hero-role" id="heroRole">Competitive Programmer &middot; Aspiring Security Researcher</div>
-  <p class="hero-bio" id="heroBio">
-    I write <strong>Python, C++, and Bash</strong> because I genuinely can't stop. Right now I'm splitting my time between
-    <strong class="amber-text" style="color:var(--amber)">IOI-track algorithms</strong> and <strong class="amber-text" style="color:var(--amber)">CTF/security fundamentals</strong> &mdash;
-    two different ways of asking the same question: how does this actually work, and how does it break.
-  </p>
-  <div class="hero-links" id="heroLinks">
-    <a href="#projects" class="hlink primary">View Projects</a>
-    <a href="#contact" class="hlink">Get In Touch</a>
-  </div>
-</section>
+<header class="topbar">
+  <a class="logo" href="#hero">&lt;<b>SD</b> /&gt;</a>
+  <nav aria-label="Primary">
+    <a href="#about">about</a>
+    <a href="#skills">skills</a>
+    <a href="#projects">projects</a>
+    <a href="#path">path</a>
+    <a href="#contact">contact</a>
+  </nav>
+</header>
 
-<section id="about">
-  <div class="eyebrow">about.md</div>
-  <div class="about-grid">
-    <div class="about-copy fade">
-      <p>I'm Savindu, a coder from Sri Lanka who started out of pure curiosity and never really stopped. I didn't follow a roadmap &mdash; I just kept poking at things until they made sense.</p>
-      <p>Most of my time goes into <strong>Python, C++, and Bash</strong>. Python is where I'm comfortable. C++ is where I'm pushing hardest right now, mostly through competitive programming. Bash is what I reach for the moment I catch myself doing something twice.</p>
-      <p>I run most of my dev work out of <strong>Termux</strong> &mdash; a full environment off a phone. Working inside that kind of constraint forces you to actually understand your tools instead of leaning on defaults.</p>
-      <p>Lately that curiosity has pointed toward <strong>cybersecurity</strong>. Not as a label, just because understanding how systems fail is the most honest way to understand how they work.</p>
-    </div>
-    <div class="stat-row fade">
-      <div class="stat"><span>Focus</span><span>Algorithms &amp; Security</span></div>
-      <div class="stat"><span>Daily driver</span><span>Termux / Linux</span></div>
-      <div class="stat"><span>Languages</span><span>Python, C/C++, Bash</span></div>
-      <div class="stat"><span>Currently</span><span>IOI prep + CTF basics</span></div>
-      <div class="stat"><span>Status</span><span style="color:var(--amber)">Building daily</span></div>
-    </div>
-  </div>
-</section>
+<main id="main">
 
-<section id="skills">
-  <div class="eyebrow">skills.sh</div>
-  <div class="skill-grid">
-    <div class="skill-col">
-      <h3>Languages</h3>
-      <ul>
-        <li>Python</li>
-        <li>C / C++</li>
-        <li>Bash</li>
-        <li>HTML</li>
-      </ul>
+  <section id="hero">
+    <div class="wrap" style="max-width:900px;margin:0">
+      <div class="boot-log" id="bootLog" aria-hidden="true"></div>
+      <h1 class="hero-name" id="heroName">Savindu <span class="amber">Damsara</span><span class="cursor"></span></h1>
+      <p class="hero-role" id="heroRole">Competitive Programmer &middot; Aspiring Security Researcher</p>
+      <p class="hero-bio" id="heroBio">
+        I write <strong>Python, C++, and Bash</strong> because I genuinely can't stop. Right now I'm splitting my time between
+        <span class="accent">IOI-track algorithms</span> and <span class="accent">CTF &amp; security fundamentals</span> &mdash;
+        two different ways of asking the same question: how does this actually work, and how does it break.
+      </p>
+      <div class="hero-links" id="heroLinks">
+        <a href="#projects" class="hlink primary">View Projects</a>
+        <a href="#contact" class="hlink">Get In Touch</a>
+        <a href="https://github.com/Savindudam" target="_blank" rel="noopener" class="hlink">GitHub &#8599;</a>
+      </div>
     </div>
-    <div class="skill-col">
-      <h3>Security &amp; Systems</h3>
-      <ul>
-        <li>Linux</li>
-        <li>Termux</li>
-        <li>Cryptography basics</li>
-        <li>CTF fundamentals</li>
-      </ul>
-    </div>
-    <div class="skill-col">
-      <h3>Tools</h3>
-      <ul>
-        <li>Git / GitHub</li>
-        <li>Codeforces</li>
-        <li>Scratch</li>
-        <li>Shell scripting</li>
-      </ul>
-    </div>
-  </div>
-</section>
+  </section>
 
-<section id="projects">
-  <div class="eyebrow">projects/</div>
-  <div class="proj-list">
-    <a class="prow fade" href="https://github.com/Savindudam/Encrypter" target="_blank">
-      <span class="prow-num">01</span>
-      <div><div class="prow-name">Encrypter</div><div class="prow-desc">My first real dive into cryptography &mdash; encode and decode messages in Python, built to understand how encryption actually works, not just use it.</div></div>
-      <span class="prow-lang">Python</span><span class="prow-arr">&#8599;</span>
-    </a>
-    <a class="prow fade" href="https://github.com/Savindudam/Termux-main-package-installer" target="_blank">
-      <span class="prow-num">02</span>
-      <div><div class="prow-name">Termux Installer</div><div class="prow-desc">One script, full Termux setup. Got tired of reinstalling everything manually, so I automated the whole environment.</div></div>
-      <span class="prow-lang">Shell</span><span class="prow-arr">&#8599;</span>
-    </a>
-    <a class="prow fade" href="https://github.com/Savindudam/Mini-Games-Hub" target="_blank">
-      <span class="prow-num">03</span>
-      <div><div class="prow-name">Mini Games Hub</div><div class="prow-desc">Guess the Number, Rock Paper Scissors, Word Jumble &mdash; a small arcade that started as one game and kept growing.</div></div>
-      <span class="prow-lang">Python</span><span class="prow-arr">&#8599;</span>
-    </a>
-    <a class="prow fade" href="https://github.com/Savindudam/Guess-my-number.py" target="_blank">
-      <span class="prow-num">04</span>
-      <div><div class="prow-name">Guess My Number</div><div class="prow-desc">Classic number guessing with hints and scoring &mdash; one of the first things I shipped and actually felt good about.</div></div>
-      <span class="prow-lang">Python</span><span class="prow-arr">&#8599;</span>
-    </a>
-    <a class="prow fade" href="https://github.com/Savindudam/word-jumble-game" target="_blank">
-      <span class="prow-num">05</span>
-      <div><div class="prow-name">Word Jumble</div><div class="prow-desc">Scramble a word, unscramble it. A small puzzle that took an afternoon and turned out better than expected.</div></div>
-      <span class="prow-lang">Python</span><span class="prow-arr">&#8599;</span>
-    </a>
-    <a class="prow fade" href="https://github.com/Savindudam/Rock-Paper-Scissor" target="_blank">
-      <span class="prow-num">06</span>
-      <div><div class="prow-name">Rock Paper Scissors</div><div class="prow-desc">You vs. the computer &mdash; harder to make interesting than it sounds, since it's really about randomness and clean game logic.</div></div>
-      <span class="prow-lang">Python</span><span class="prow-arr">&#8599;</span>
-    </a>
-  </div>
-</section>
+  <section id="about">
+    <div class="wrap">
+      <div class="eyebrow">about.md</div>
+      <div class="about-grid">
+        <div class="about-copy fade">
+          <p>I'm Savindu, a coder from Sri Lanka who started out of pure curiosity and never really stopped. I didn't follow a roadmap &mdash; I just kept poking at things until they made sense.</p>
+          <p>Most of my time goes into <strong>Python, C++, and Bash</strong>. Python is where I'm comfortable. C++ is where I'm pushing hardest right now, mostly through competitive programming. Bash is what I reach for the moment I catch myself doing something twice.</p>
+          <p>I run most of my dev work out of <strong>Termux</strong> &mdash; a full environment off a phone. Working inside that kind of constraint forces you to actually understand your tools instead of leaning on defaults.</p>
+          <p>Lately that curiosity has pointed toward <span class="amber-text">cybersecurity</span>. Not as a label, just because understanding how systems fail is the most honest way to understand how they work.</p>
+        </div>
+        <div class="fade">
+          <div class="stat"><span>Focus</span><span>Algorithms &amp; Security</span></div>
+          <div class="stat"><span>Daily driver</span><span>Termux / Linux</span></div>
+          <div class="stat"><span>Languages</span><span>Python, C/C++, Bash</span></div>
+          <div class="stat"><span>Currently</span><span>IOI prep + CTF basics</span></div>
+          <div class="stat"><span>Status</span><span style="color:var(--amber)">Building daily</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<section id="path">
-  <div class="eyebrow">path.log &mdash; two tracks, running in parallel</div>
-  <div class="path-grid">
-    <div class="path-col fade">
-      <h3>Algorithms</h3>
-      <div class="sub">IOI 2027 track</div>
-      <ol>
-        <li>C++ fundamentals, recursion, and complexity</li>
-        <li>STL core &mdash; vectors, sets, maps, heaps</li>
-        <li>Greedy, binary search, dynamic programming</li>
-        <li>Graphs, trees, and advanced data structures</li>
-        <li>Weekly timed mocks on Codeforces / CSES</li>
-      </ol>
+  <section id="skills">
+    <div class="wrap">
+      <div class="eyebrow">skills.sh</div>
+      <div class="term fade">
+        <div class="term-bar">
+          <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+          <span class="term-path">~/<span class="amber">savindu</span> $ tree skills/</span>
+        </div>
+        <div class="term-body">
+<div class="tree" role="img" aria-label="Skill tree: Languages - Python, C and C++, Bash, HTML and JS. Security and Systems - Linux, Termux, cryptography basics, CTF fundamentals. Tools - Git and GitHub, Codeforces, Scratch, shell scripting.">skills/
+├── <span class="dir">languages/</span>
+│   ├── <span class="leaf">python</span>
+│   ├── <span class="leaf">c / c++</span>
+│   ├── <span class="leaf">bash</span>
+│   └── <span class="leaf">html / js</span>
+├── <span class="dir">security-systems/</span>
+│   ├── <span class="leaf">linux</span>
+│   ├── <span class="leaf">termux</span>
+│   ├── <span class="leaf">cryptography basics</span>
+│   └── <span class="leaf">ctf fundamentals</span>
+└── <span class="dir">tools/</span>
+    ├── <span class="leaf">git / github</span>
+    ├── <span class="leaf">codeforces</span>
+    ├── <span class="leaf">scratch</span>
+    └── <span class="leaf">shell scripting</span> <span class="comment"># 4 dirs, 12 files</span></div>
+        </div>
+      </div>
     </div>
-    <div class="path-col fade">
-      <h3>Security</h3>
-      <div class="sub">CTF / ethical hacking track</div>
-      <ol>
-        <li>Linux fundamentals and core networking</li>
-        <li>picoCTF &mdash; general skills, web, crypto</li>
-        <li>Forensics and early binary exploitation</li>
-        <li>Python scripting for security automation</li>
-        <li>Live CTF competitions via ctftime.org</li>
-      </ol>
-    </div>
-  </div>
-</section>
+  </section>
 
-<section id="contact">
-  <div class="eyebrow">contact</div>
-  <div class="connect-grid">
-    <div class="fade">
-      <div class="connect-lead">Always up for talking <span class="amber">code</span>, swapping ideas, or building something together.</div>
-      <p class="connect-sub">Don't overthink it &mdash; just reach out. I'm on GitHub and Instagram, either works.</p>
+  <section id="projects">
+    <div class="wrap">
+      <div class="eyebrow">projects/ — pulled live from github.com/Savindudam</div>
+      <div class="proj-grid" id="projGrid"></div>
     </div>
-    <div class="slinks fade">
-      <a class="slink" href="https://github.com/Savindudam" target="_blank">
-        <div><span class="slink-name">GitHub</span><span class="slink-handle">github.com/Savindudam</span></div>
-        <span class="slink-arr">&#8599;</span>
-      </a>
-      <a class="slink" href="https://instagram.com/dreamxhava_2" target="_blank">
-        <div><span class="slink-name">Instagram</span><span class="slink-handle">@dreamxhava_2</span></div>
-        <span class="slink-arr">&#8599;</span>
-      </a>
+  </section>
+
+  <section id="path">
+    <div class="wrap">
+      <div class="eyebrow">path.log — two tracks, running in parallel</div>
+      <div class="path-grid fade">
+        <div class="path-col">
+          <h3>Algorithms</h3>
+          <div class="sub">IOI track</div>
+          <ol>
+            <li>C++ fundamentals, recursion, and complexity</li>
+            <li>STL core &mdash; vectors, sets, maps, heaps</li>
+            <li>Greedy, binary search, dynamic programming</li>
+            <li>Graphs, trees, and advanced data structures</li>
+            <li>Weekly timed mocks on Codeforces / CSES</li>
+          </ol>
+        </div>
+        <div class="path-col">
+          <h3>Security</h3>
+          <div class="sub">CTF / ethical hacking track</div>
+          <ol>
+            <li>Linux fundamentals and core networking</li>
+            <li>picoCTF &mdash; general skills, web, crypto</li>
+            <li>Forensics and early binary exploitation</li>
+            <li>Python scripting for security automation</li>
+            <li>Live CTF competitions via ctftime.org</li>
+          </ol>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <div class="eyebrow">contact</div>
+      <div class="connect-grid">
+        <div class="fade">
+          <div class="prompt-line"><span class="amber">savindu@sri-lanka</span>:~$ echo $REASON_TO_REACH_OUT</div>
+          <div class="connect-lead">Always up for talking <span class="amber">code</span>, swapping ideas, or building something together.</div>
+          <p class="connect-sub">Don't overthink it &mdash; just reach out. I'm on GitHub and Instagram, either works.</p>
+        </div>
+        <div class="slinks fade">
+          <a class="slink" href="https://github.com/Savindudam" target="_blank" rel="noopener">
+            <div><span class="slink-name">GitHub</span><span class="slink-handle">github.com/Savindudam</span></div>
+            <span class="slink-arr">&#8599;</span>
+          </a>
+          <a class="slink" href="https://instagram.com/dreamxhava_2" target="_blank" rel="noopener">
+            <div><span class="slink-name">Instagram</span><span class="slink-handle">@dreamxhava_2</span></div>
+            <span class="slink-arr">&#8599;</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
 
 <footer>
   <span>&copy; 2026 Savindu Damsara</span>
-  <span class="ft-live"><span class="dot"></span>building daily</span>
+  <span class="ft-live"><span class="dot"></span>building daily &middot; up <span id="uptime">00:00</span></span>
 </footer>
+
+<nav class="tmux-bar" aria-label="Section navigation">
+  <div class="tmux-session">[savindu]</div>
+  <div class="tmux-tabs" id="tmuxTabs">
+    <a class="tmux-tab" data-target="hero" href="#hero"><b>0</b>home</a>
+    <a class="tmux-tab" data-target="about" href="#about"><b>1</b>about</a>
+    <a class="tmux-tab" data-target="skills" href="#skills"><b>2</b>skills</a>
+    <a class="tmux-tab" data-target="projects" href="#projects"><b>3</b>work</a>
+    <a class="tmux-tab" data-target="path" href="#path"><b>4</b>path</a>
+    <a class="tmux-tab" data-target="contact" href="#contact"><b>5</b>contact</a>
+  </div>
+</nav>
 
 <script>
 (function(){
-  const lines = [
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- boot sequence ---------- */
+  var lines = [
     ["$ whoami", null],
     ["> loading profile...", "ok"],
     ["> stack: python, c++, bash", "ok"],
     ["> tracks: ioi-algorithms, ctf-security", "ok"],
     ["> status: ready", "ok"]
   ];
-  const log = document.getElementById('bootLog');
-  let i = 0;
-  function typeLine(){
-    if(i >= lines.length){
-      document.getElementById('heroName').classList.add('show');
-      document.getElementById('heroRole').classList.add('show');
-      document.getElementById('heroBio').classList.add('show');
-      document.getElementById('heroLinks').classList.add('show');
-      return;
-    }
-    const [text, cls] = lines[i];
-    const div = document.createElement('div');
-    if(cls) div.className = cls;
-    div.textContent = text;
-    log.appendChild(div);
-    i++;
-    setTimeout(typeLine, 220);
+  var log = document.getElementById('bootLog');
+  function showFinal(){
+    document.getElementById('heroName').classList.add('show');
+    document.getElementById('heroRole').classList.add('show');
+    document.getElementById('heroBio').classList.add('show');
+    document.getElementById('heroLinks').classList.add('show');
   }
-  typeLine();
+  if(reduceMotion){
+    lines.forEach(function(l){
+      var div=document.createElement('div');
+      if(l[1]) div.className=l[1];
+      div.textContent=l[0];
+      log.appendChild(div);
+    });
+    showFinal();
+  } else {
+    var i=0;
+    (function typeLine(){
+      if(i>=lines.length){ showFinal(); return; }
+      var l=lines[i], div=document.createElement('div');
+      if(l[1]) div.className=l[1];
+      div.textContent=l[0];
+      log.appendChild(div);
+      i++;
+      setTimeout(typeLine,200);
+    })();
+  }
 
-  const obs = new IntersectionObserver(entries=>{
-    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
-  },{threshold:.1});
-  document.querySelectorAll('.fade').forEach(el=>obs.observe(el));
+  /* ---------- fade-in on scroll ---------- */
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('in'); });
+  },{threshold:.12});
+  document.querySelectorAll('.fade').forEach(function(el){ obs.observe(el); });
+
+  /* ---------- active-section tracking for tmux bar + top nav ---------- */
+  var sectionIds = ['hero','about','skills','projects','path','contact'];
+  var tabs = document.querySelectorAll('.tmux-tab');
+  var topLinks = document.querySelectorAll('.topbar nav a');
+  var secObs = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(!entry.isIntersecting) return;
+      var id = entry.target.id;
+      tabs.forEach(function(t){ t.classList.toggle('active', t.dataset.target===id); });
+      topLinks.forEach(function(a){ a.style.color = a.getAttribute('href')==='#'+id ? 'var(--amber)' : ''; });
+    });
+  },{rootMargin:'-45% 0px -50% 0px'});
+  sectionIds.forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) secObs.observe(el);
+  });
+
+  /* ---------- session uptime ---------- */
+  if(!reduceMotion){
+    var start = Date.now();
+    var upEl = document.getElementById('uptime');
+    setInterval(function(){
+      var s = Math.floor((Date.now()-start)/1000);
+      var mm = String(Math.floor(s/60)).padStart(2,'0');
+      var ss = String(s%60).padStart(2,'0');
+      if(upEl) upEl.textContent = mm+':'+ss;
+    },1000);
+  }
+
+  /* ---------- projects, pulled from GitHub ---------- */
+  var FALLBACK_PROJECTS = [
+    {
+      name: "Encrypt---Decrypt",
+      file: "cipher.js",
+      desc: "A vanilla-JS cipher toolkit with five methods — Caesar, Vigenère, ROT13, XOR, and Base64+Reverse — with a real-time encrypt/decrypt UI.",
+      lang: "JavaScript",
+      stars: 0,
+      url: "https://github.com/Savindudam/Encrypt---Decrypt",
+      demo: null
+    },
+    {
+      name: "cp-blog",
+      file: "notes.js",
+      desc: "A running blog of competitive-programming notes and write-ups from Codeforces and CSES practice.",
+      lang: "JavaScript",
+      stars: 1,
+      url: "https://github.com/Savindudam/cp-blog",
+      demo: "https://cp-blog-eight.vercel.app"
+    },
+    {
+      name: "Competitive_Programming",
+      file: "solutions.js",
+      desc: "A working archive of solved problems, templates, and patterns built up during contest practice.",
+      lang: "JavaScript",
+      stars: 0,
+      url: "https://github.com/Savindudam/Competitive_Programming",
+      demo: "https://competitive-programming-mu.vercel.app"
+    },
+    {
+      name: "Friend_To_Friend",
+      file: "index.js",
+      desc: "Encrypts a message and stores it under a passcode and message ID — return with both and the message reappears.",
+      lang: "JavaScript",
+      stars: 0,
+      url: "https://github.com/Savindudam/Friend_To_Friend",
+      demo: "https://friend-to-friend.vercel.app"
+    },
+    {
+      name: "YT-Downloader",
+      file: "index.html",
+      desc: "A simple browser tool for pulling down YouTube videos directly, no extra software required.",
+      lang: "HTML",
+      stars: 0,
+      url: "https://github.com/Savindudam/YT-Downloader",
+      demo: "https://yt-downloader-theta-mauve.vercel.app"
+    },
+    {
+      name: "Web-Notepad",
+      file: "index.html",
+      desc: "A browser notepad for jotting things down and downloading the file straight to your device.",
+      lang: "HTML",
+      stars: 0,
+      url: "https://github.com/Savindudam/Web-Notepad",
+      demo: "https://web-notepad-nine.vercel.app"
+    },
+    {
+      name: "Termux-main-package-installer",
+      file: "setup.sh",
+      desc: "One script, full Termux setup. Got tired of reinstalling everything manually, so I automated the whole environment.",
+      lang: "Shell",
+      stars: 0,
+      url: "https://github.com/Savindudam/Termux-main-package-installer",
+      demo: null
+    }
+  ];
+
+  function renderProjects(list){
+    var grid = document.getElementById('projGrid');
+    grid.innerHTML = '';
+    list.forEach(function(p){
+      var a = document.createElement('a');
+      a.className = 'pcard fade in';
+      a.href = p.demo || p.url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      var starBit = p.stars > 0 ? '<span class="pcard-star">&#9733; '+p.stars+'</span>' : '<span class="pcard-star"></span>';
+      a.innerHTML =
+        '<div class="pcard-bar">'+
+          '<span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>'+
+          '<span class="pcard-file">'+p.file+'</span>'+
+        '</div>'+
+        '<div class="pcard-body">'+
+          '<div class="pcard-name">'+p.name+'</div>'+
+          '<div class="pcard-desc">'+p.desc+'</div>'+
+          '<div class="pcard-foot">'+
+            '<span class="pcard-lang">'+p.lang+'</span>'+
+            starBit+
+            '<span class="pcard-arr">&#8599;</span>'+
+          '</div>'+
+        '</div>';
+      grid.appendChild(a);
+    });
+  }
+
+  // Render immediately so the section is never empty, then try to refresh
+  // with live GitHub data in case any repo details have changed since.
+  renderProjects(FALLBACK_PROJECTS);
+  fetch('https://api.github.com/users/Savindudam/repos?per_page=100')
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(repos){
+      if(!Array.isArray(repos)) return;
+      var byName = {};
+      repos.forEach(function(r){ byName[r.name] = r; });
+      var merged = FALLBACK_PROJECTS.map(function(p){
+        var live = byName[p.name];
+        if(!live) return p;
+        return Object.assign({}, p, {
+          stars: live.stargazers_count || 0,
+          lang: live.language || p.lang,
+          demo: live.homepage || p.demo,
+          url: live.html_url || p.url
+        });
+      });
+      renderProjects(merged);
+    })
+    .catch(function(){ /* fallback data already rendered */ });
 })();
 </script>
 
 </body>
 </html>
-
