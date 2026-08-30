@@ -37,6 +37,7 @@ body{
   overflow-x:hidden;
   padding-bottom:var(--bar-h);
   line-height:1.6;
+  cursor:auto;
 }
 body::before{
   content:'';
@@ -58,6 +59,18 @@ a{color:inherit}
 
 :focus-visible{outline:2px solid var(--amber);outline-offset:3px}
 
+/* ============ CUSTOM CURSOR ACCENT ============ */
+#cursorDot{
+  position:fixed;top:0;left:0;width:18px;height:18px;
+  border:1px solid var(--amber);border-radius:3px;
+  pointer-events:none;z-index:300;
+  transform:translate(-50%,-50%);
+  opacity:0;transition:opacity .25s ease,width .15s,height .15s,border-radius .15s;
+}
+#cursorDot.show{opacity:.85}
+#cursorDot.pointer{width:10px;height:10px;border-radius:50%;background:var(--amber);border-color:transparent}
+@media(hover:none),(pointer:coarse){ #cursorDot{display:none} }
+
 /* ============ TOP BAR (desktop nav) ============ */
 .topbar{
   position:fixed;top:0;left:0;right:0;z-index:90;
@@ -68,13 +81,13 @@ a{color:inherit}
 }
 .logo{font-family:var(--mono);font-weight:700;color:var(--ink);font-size:.95rem;text-decoration:none}
 .logo b{color:var(--amber);font-weight:700}
-.topbar nav{display:flex;gap:2rem;list-style:none}
+.topbar nav{display:flex;gap:1.8rem;list-style:none}
 .topbar nav a{
-  font-family:var(--mono);font-size:.66rem;letter-spacing:1.5px;text-transform:uppercase;
+  font-family:var(--mono);font-size:.64rem;letter-spacing:1.3px;text-transform:uppercase;
   color:var(--ink-dim);text-decoration:none;transition:color .15s;padding:.2rem 0;
 }
 .topbar nav a:hover{color:var(--amber)}
-@media(max-width:820px){ .topbar nav{display:none} }
+@media(max-width:900px){ .topbar nav{display:none} }
 
 /* ============ SHARED SECTION RHYTHM ============ */
 main{position:relative;z-index:1}
@@ -89,6 +102,7 @@ section{
 }
 .eyebrow::before{content:'//'}
 .wrap{max-width:1080px;margin:0 auto}
+.lede{color:var(--ink-dim);font-size:.9rem;max-width:640px;margin-bottom:1.8rem;line-height:1.8}
 
 /* ============ TERMINAL WINDOW CHROME (signature element) ============ */
 .term{
@@ -103,30 +117,32 @@ section{
   background:var(--panel2);
   border-bottom:1px solid var(--rule);
 }
-.term-dot{width:9px;height:9px;border-radius:50%;background:var(--rule)}
+.term-dot{width:9px;height:9px;border-radius:50%;background:var(--rule);flex-shrink:0}
 .term-dot.r{background:#c9564a}
 .term-dot.y{background:#c9a13b}
 .term-dot.g{background:#4f9d5c}
 .term-path{
   font-family:var(--mono);font-size:.68rem;color:var(--ink-faint);
-  margin-left:.4rem;
+  margin-left:.4rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .term-path .amber{color:var(--amber-dim)}
 .term-body{padding:1.6rem}
-@media(max-width:600px){ .term-body{padding:1.2rem} }
+@media(max-width:600px){ .term-body{padding:1.1rem} }
 
 /* ============ HERO ============ */
 #hero{
   min-height:100svh;display:flex;flex-direction:column;justify-content:center;
   padding-top:calc(6rem + 1.5rem);
   border-bottom:1px solid var(--rule-soft);
+  position:relative;overflow:hidden;
 }
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.55;pointer-events:none}
+#hero .wrap{position:relative;z-index:1}
 .boot-log{
   font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);
   line-height:2;min-height:8.5rem;margin-bottom:1.6rem;
 }
 .boot-log .ok{color:var(--amber-dim)}
-.boot-log .tag{color:var(--ink-dim)}
 .hero-name{
   font-family:var(--mono);font-weight:800;
   font-size:clamp(2.3rem,8.5vw,5.2rem);line-height:1.02;letter-spacing:-1px;
@@ -153,7 +169,7 @@ section{
 .hlink{
   font-family:var(--mono);font-size:.7rem;letter-spacing:1px;text-transform:uppercase;
   padding:.75rem 1.3rem;border:1px solid var(--rule);color:var(--ink-dim);text-decoration:none;
-  transition:.2s;display:inline-block;
+  transition:.2s;display:inline-block;background:transparent;cursor:pointer;
 }
 .hlink:hover{border-color:var(--amber);color:var(--amber)}
 .hlink.primary{background:var(--amber);color:#100c00;border-color:var(--amber);font-weight:700}
@@ -171,13 +187,37 @@ section{
 }
 .stat span:first-child{color:var(--ink-faint)}
 .stat span:last-child{color:var(--ink);text-align:right}
+.resume-btn-wrap{margin-top:1.3rem}
+
+/* ============ GITHUB STATS ============ */
+.stats-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:1.1rem}
+@media(max-width:820px){ .stats-grid{grid-template-columns:1fr} }
+.stats-grid .term-body{padding:1rem;display:flex;align-items:center;justify-content:center;min-height:180px}
+.stats-grid img{width:100%;height:auto}
 
 /* ============ SKILLS (tree listing) ============ */
 .tree{font-family:var(--mono);font-size:.82rem;line-height:2;color:var(--ink-dim);white-space:pre;overflow-x:auto}
 .tree .dir{color:var(--amber)}
 .tree .leaf{color:var(--ink-dim)}
 .tree .comment{color:var(--ink-faint)}
-@media(max-width:480px){ .tree{font-size:.72rem} }
+@media(max-width:480px){ .tree{font-size:.7rem} }
+
+/* ============ PLAYGROUND (sorting visualizer) ============ */
+.viz-controls{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:space-between;margin-bottom:1.1rem}
+.viz-algos,.viz-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+.viz-btn{
+  font-family:var(--mono);font-size:.66rem;letter-spacing:.5px;text-transform:uppercase;
+  padding:.55rem 1rem;border:1px solid var(--rule);background:transparent;color:var(--ink-dim);
+  cursor:pointer;transition:.15s;border-radius:4px;
+}
+.viz-btn:hover{border-color:var(--amber-dim);color:var(--ink)}
+.viz-btn.active{border-color:var(--amber);color:var(--amber);background:var(--amber-wash)}
+.viz-btn.primary{background:var(--amber);color:#100c00;border-color:var(--amber);font-weight:700}
+.viz-btn.primary:hover{background:#ffc233;color:#100c00}
+.viz-btn:disabled{opacity:.4;cursor:not-allowed}
+#vizCanvas{width:100%;height:220px;display:block;background:var(--bg-soft);border-radius:6px;border:1px solid var(--rule-soft)}
+.viz-meta{display:flex;justify-content:space-between;margin-top:.7rem;font-family:var(--mono);font-size:.66rem;color:var(--ink-faint)}
+.viz-meta #vizStatus{color:var(--amber-dim);text-transform:uppercase;letter-spacing:.5px}
 
 /* ============ PROJECTS ============ */
 .proj-grid{
@@ -203,6 +243,34 @@ section{
 .pcard-arr{font-family:var(--mono);color:var(--ink-faint);transition:.15s}
 .pcard:hover .pcard-arr{color:var(--amber);transform:translate(2px,-2px)}
 
+/* ============ WRITING ============ */
+.write-card{
+  display:flex;justify-content:space-between;align-items:center;gap:1.5rem;
+  background:var(--panel);border:1px solid var(--rule);border-radius:8px;
+  padding:1.6rem 1.8rem;text-decoration:none;color:inherit;transition:.15s;
+}
+.write-card:hover{border-color:var(--amber-dim);transform:translateY(-2px)}
+.write-card-name{font-family:var(--mono);font-weight:700;font-size:1.15rem;color:var(--ink);margin-bottom:.5rem}
+.write-card-desc{font-size:.88rem;color:var(--ink-dim);line-height:1.8;max-width:560px;margin-bottom:1rem}
+.write-tags{display:flex;flex-wrap:wrap;gap:.5rem}
+.write-tags span{
+  font-family:var(--mono);font-size:.62rem;color:var(--amber-dim);border:1px solid var(--rule);
+  padding:.3rem .6rem;border-radius:4px;text-transform:uppercase;letter-spacing:.4px;
+}
+.write-arr{font-family:var(--mono);font-size:1.4rem;color:var(--ink-faint);flex-shrink:0;transition:.15s}
+.write-card:hover .write-arr{color:var(--amber);transform:translate(3px,-3px)}
+@media(max-width:600px){ .write-card{flex-direction:column;align-items:flex-start} }
+
+/* ============ MILESTONES (git log) ============ */
+.gitlog{position:relative;padding-left:1.6rem}
+.gitlog::before{content:'';position:absolute;left:4px;top:6px;bottom:6px;width:1px;background:var(--rule)}
+.glog-row{position:relative;padding:0 0 1.6rem 1.2rem}
+.glog-row:last-child{padding-bottom:0}
+.glog-dot{position:absolute;left:-1.6rem;top:.35rem;width:9px;height:9px;border-radius:50%;background:var(--amber);
+  box-shadow:0 0 0 3px var(--bg)}
+.glog-date{font-family:var(--mono);font-size:.66rem;color:var(--amber-dim);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:.3rem}
+.glog-msg{font-size:.88rem;color:var(--ink-dim);line-height:1.7;max-width:600px}
+
 /* ============ DUAL PATH ============ */
 #path{background:var(--bg-soft)}
 .path-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);border-radius:8px;overflow:hidden}
@@ -222,7 +290,7 @@ section{
 .prompt-line .amber{color:var(--amber)}
 .connect-lead{font-family:var(--mono);font-weight:700;font-size:clamp(1.25rem,3.5vw,1.6rem);line-height:1.45;color:var(--ink);margin-bottom:1rem}
 .connect-lead .amber{color:var(--amber)}
-.connect-sub{font-size:.88rem;color:var(--ink-dim);line-height:1.85}
+.connect-sub{font-size:.88rem;color:var(--ink-dim);line-height:1.85;margin-bottom:1.3rem}
 .slinks{display:flex;flex-direction:column;gap:1px;background:var(--rule);border-radius:8px;overflow:hidden}
 .slink{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;background:var(--bg);text-decoration:none;transition:.15s}
 .slink:hover{background:var(--panel2)}
@@ -238,7 +306,7 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
 @media (prefers-reduced-motion:no-preference){ .dot{animation:pulse 2.2s ease infinite} }
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 
-/* ============ TMUX-STYLE STATUS BAR (mobile nav, signature element #2) ============ */
+/* ============ TMUX-STYLE STATUS BAR (mobile nav) ============ */
 .tmux-bar{
   position:fixed;left:0;right:0;bottom:0;z-index:95;
   display:none;
@@ -264,8 +332,8 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
 .tmux-tab b{color:var(--ink-faint);font-weight:600}
 .tmux-tab.active{color:var(--amber);background:var(--amber-wash)}
 .tmux-tab.active b{color:var(--amber)}
-@media(max-width:820px){ .tmux-bar{display:flex} }
-@media(min-width:821px){ body{padding-bottom:0} }
+@media(max-width:900px){ .tmux-bar{display:flex} }
+@media(min-width:901px){ body{padding-bottom:0} }
 
 .fade{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
 .fade.in{opacity:1;transform:none}
@@ -273,18 +341,37 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
   .fade{opacity:1;transform:none;transition:none}
   .hero-name,.hero-role,.hero-bio,.hero-links{opacity:1 !important;animation:none !important;transition:none !important}
 }
+
+/* ============ PRINT RESUME ============ */
+.only-print{display:none}
+@media print{
+  body::before,#cursorDot,.topbar,.tmux-bar,footer,#heroCanvas{display:none !important}
+  main > section{display:none !important}
+  body{padding-bottom:0;background:#fff;color:#111}
+  .only-print{
+    display:block !important;color:#111;font-family:var(--sans);padding:0 1cm;
+  }
+  .only-print h1{font-family:var(--mono);font-size:22pt;margin-bottom:.2cm}
+  .only-print h2{font-family:var(--mono);font-size:11pt;text-transform:uppercase;letter-spacing:1px;
+    margin:.7cm 0 .25cm;border-bottom:1px solid #ccc;padding-bottom:.1cm;color:#333}
+  .only-print p,.only-print li{font-size:10.5pt;line-height:1.5;color:#222}
+  .only-print .print-tagline{font-family:var(--mono);color:#555;margin-bottom:.15cm}
+  .only-print ul{padding-left:1.1em;margin-bottom:.3cm}
+}
 </style>
 </head>
 <body>
 
 <a class="skip-link" href="#main">Skip to content</a>
+<div id="cursorDot" aria-hidden="true"></div>
 
 <header class="topbar">
   <a class="logo" href="#hero">&lt;<b>SD</b> /&gt;</a>
   <nav aria-label="Primary">
     <a href="#about">about</a>
     <a href="#skills">skills</a>
-    <a href="#projects">projects</a>
+    <a href="#playground">play</a>
+    <a href="#projects">work</a>
     <a href="#path">path</a>
     <a href="#contact">contact</a>
   </nav>
@@ -293,6 +380,7 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
 <main id="main">
 
   <section id="hero">
+    <canvas id="heroCanvas" aria-hidden="true"></canvas>
     <div class="wrap" style="max-width:900px;margin:0">
       <div class="boot-log" id="bootLog" aria-hidden="true"></div>
       <h1 class="hero-name" id="heroName">Savindu <span class="amber">Damsara</span><span class="cursor"></span></h1>
@@ -304,7 +392,7 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
       </p>
       <div class="hero-links" id="heroLinks">
         <a href="#projects" class="hlink primary">View Projects</a>
-        <a href="#contact" class="hlink">Get In Touch</a>
+        <a href="#playground" class="hlink">Try the Visualizer</a>
         <a href="https://github.com/Savindudam" target="_blank" rel="noopener" class="hlink">GitHub &#8599;</a>
       </div>
     </div>
@@ -319,6 +407,9 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
           <p>Most of my time goes into <strong>Python, C++, and Bash</strong>. Python is where I'm comfortable. C++ is where I'm pushing hardest right now, mostly through competitive programming. Bash is what I reach for the moment I catch myself doing something twice.</p>
           <p>I run most of my dev work out of <strong>Termux</strong> &mdash; a full environment off a phone. Working inside that kind of constraint forces you to actually understand your tools instead of leaning on defaults.</p>
           <p>Lately that curiosity has pointed toward <span class="amber-text">cybersecurity</span>. Not as a label, just because understanding how systems fail is the most honest way to understand how they work.</p>
+          <div class="resume-btn-wrap no-print">
+            <button class="hlink" id="resumeBtn" type="button">Download Resume (PDF)</button>
+          </div>
         </div>
         <div class="fade">
           <div class="stat"><span>Focus</span><span>Algorithms &amp; Security</span></div>
@@ -326,6 +417,32 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
           <div class="stat"><span>Languages</span><span>Python, C/C++, Bash</span></div>
           <div class="stat"><span>Currently</span><span>IOI prep + CTF basics</span></div>
           <div class="stat"><span>Status</span><span style="color:var(--amber)">Building daily</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="github">
+    <div class="wrap">
+      <div class="eyebrow">github.stats — live from api.github.com</div>
+      <div class="stats-grid">
+        <div class="term fade">
+          <div class="term-bar">
+            <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+            <span class="term-path">~/savindu $ cat contributions.svg</span>
+          </div>
+          <div class="term-body">
+            <img src="https://ghchart.rshah.org/ffb300/Savindudam" alt="Savindu Damsara's GitHub contribution graph" loading="lazy">
+          </div>
+        </div>
+        <div class="term fade">
+          <div class="term-bar">
+            <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+            <span class="term-path">~/savindu $ cat stats.json</span>
+          </div>
+          <div class="term-body">
+            <img src="https://github-readme-stats.vercel.app/api?username=Savindudam&show_icons=true&hide_border=true&bg_color=00000000&title_color=ffb300&text_color=9aa694&icon_color=ffb300" alt="Savindu Damsara's GitHub stats card" loading="lazy">
+          </div>
         </div>
       </div>
     </div>
@@ -361,10 +478,71 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
     </div>
   </section>
 
+  <section id="playground">
+    <div class="wrap">
+      <div class="eyebrow">playground.cpp — sorting, visualized</div>
+      <p class="lede">A quick look at what the algorithms track actually looks like. Pick an algorithm, shuffle the bars, and watch it sort.</p>
+      <div class="term fade">
+        <div class="term-bar">
+          <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+          <span class="term-path">~/savindu $ ./sort --visualize</span>
+        </div>
+        <div class="term-body">
+          <div class="viz-controls">
+            <div class="viz-algos" role="group" aria-label="Choose algorithm">
+              <button class="viz-btn active" data-algo="bubble" type="button">Bubble</button>
+              <button class="viz-btn" data-algo="selection" type="button">Selection</button>
+              <button class="viz-btn" data-algo="quick" type="button">Quick</button>
+            </div>
+            <div class="viz-actions">
+              <button class="viz-btn" id="vizShuffle" type="button">Shuffle</button>
+              <button class="viz-btn primary" id="vizRun" type="button">Run</button>
+            </div>
+          </div>
+          <canvas id="vizCanvas" role="img" aria-label="Bar chart animating the selected sorting algorithm"></canvas>
+          <div class="viz-meta">
+            <span id="vizStatus">ready</span>
+            <span id="vizCompares">comparisons: 0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="projects">
     <div class="wrap">
       <div class="eyebrow">projects/ — pulled live from github.com/Savindudam</div>
       <div class="proj-grid" id="projGrid"></div>
+    </div>
+  </section>
+
+  <section id="writing">
+    <div class="wrap">
+      <div class="eyebrow">writing/ — notes from the grind</div>
+      <a class="write-card fade" href="https://cp-blog-eight.vercel.app" target="_blank" rel="noopener">
+        <div class="write-card-main">
+          <div class="write-card-name">cp-blog</div>
+          <p class="write-card-desc">Running notes from competitive-programming practice — problems that took too long, patterns worth remembering, contest post-mortems.</p>
+          <div class="write-tags">
+            <span>graph algorithms</span><span>dp patterns</span><span>contest post-mortems</span><span>ctf write-ups</span>
+          </div>
+        </div>
+        <span class="write-arr">&#8599;</span>
+      </a>
+    </div>
+  </section>
+
+  <section id="milestones">
+    <div class="wrap">
+      <div class="eyebrow">git log --oneline --all — the last two years, roughly</div>
+      <div class="gitlog fade">
+        <div class="glog-row"><span class="glog-dot"></span><span class="glog-date">Jan 2024</span><span class="glog-msg">First scripts — a Termux package installer and a number-guessing game.</span></div>
+        <div class="glog-row"><span class="glog-dot"></span><span class="glog-date">Mar – May 2024</span><span class="glog-msg">Small browser games: Rock Paper Scissors, a word-jumble puzzle.</span></div>
+        <div class="glog-row"><span class="glog-dot"></span><span class="glog-date">Feb 2026</span><span class="glog-msg">First real dive into cryptography — Caesar, Vigenère, XOR, and Base64 ciphers in the browser.</span></div>
+        <div class="glog-row"><span class="glog-dot"></span><span class="glog-date">Apr 2026</span><span class="glog-msg">Experimenting with Sprig and Beest, two Hack Club projects, alongside a run of small sites and utilities.</span></div>
+        <div class="glog-row"><span class="glog-dot"></span><span class="glog-date">May 2026</span><span class="glog-msg">Started a competitive-programming archive and cp-blog.</span></div>
+        <div class="glog-row"><span class="glog-dot"></span><span class="glog-date">Jul – Aug 2026</span><span class="glog-msg">Shipping continuously — a YouTube downloader, a web notepad, and this site.</span></div>
+      </div>
     </div>
   </section>
 
@@ -406,6 +584,7 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
           <div class="prompt-line"><span class="amber">savindu@sri-lanka</span>:~$ echo $REASON_TO_REACH_OUT</div>
           <div class="connect-lead">Always up for talking <span class="amber">code</span>, swapping ideas, or building something together.</div>
           <p class="connect-sub">Don't overthink it &mdash; just reach out. I'm on GitHub and Instagram, either works.</p>
+          <button class="hlink" id="resumeBtn2" type="button">Download Resume (PDF)</button>
         </div>
         <div class="slinks fade">
           <a class="slink" href="https://github.com/Savindudam" target="_blank" rel="noopener">
@@ -423,6 +602,29 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
 
 </main>
 
+<div class="only-print" id="printResume">
+  <h1>Savindu Damsara</h1>
+  <p class="print-tagline">Competitive Programmer · Aspiring Security Researcher</p>
+  <p>github.com/Savindudam &nbsp;·&nbsp; instagram.com/dreamxhava_2</p>
+  <h2>Summary</h2>
+  <p>Self-taught coder from Sri Lanka working across two tracks: competitive programming on the IOI path, and foundational cybersecurity through CTF practice. Builds small, complete tools rather than waiting for a perfect plan — daily driver is Termux on a phone.</p>
+  <h2>Focus Areas</h2>
+  <ul>
+    <li>Algorithms — IOI track, Codeforces and CSES practice, STL, DP, graphs</li>
+    <li>Security — Linux fundamentals, Termux, CTF basics, cryptography fundamentals</li>
+  </ul>
+  <h2>Skills</h2>
+  <p>Python, C / C++, Bash, HTML / JS, Linux, Termux, Git / GitHub, Codeforces, shell scripting.</p>
+  <h2>Selected Projects</h2>
+  <ul>
+    <li><strong>Encrypt---Decrypt</strong> — five-method cipher toolkit (Caesar, Vigenère, ROT13, XOR, Base64) — github.com/Savindudam/Encrypt---Decrypt</li>
+    <li><strong>cp-blog</strong> — competitive-programming notes and write-ups — cp-blog-eight.vercel.app</li>
+    <li><strong>Competitive_Programming</strong> — archive of solved problems and templates — competitive-programming-mu.vercel.app</li>
+    <li><strong>Friend_To_Friend</strong> — encrypted message-sharing tool — friend-to-friend.vercel.app</li>
+    <li><strong>Termux-main-package-installer</strong> — automated Termux environment setup</li>
+  </ul>
+</div>
+
 <footer>
   <span>&copy; 2026 Savindu Damsara</span>
   <span class="ft-live"><span class="dot"></span>building daily &middot; up <span id="uptime">00:00</span></span>
@@ -434,9 +636,10 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
     <a class="tmux-tab" data-target="hero" href="#hero"><b>0</b>home</a>
     <a class="tmux-tab" data-target="about" href="#about"><b>1</b>about</a>
     <a class="tmux-tab" data-target="skills" href="#skills"><b>2</b>skills</a>
-    <a class="tmux-tab" data-target="projects" href="#projects"><b>3</b>work</a>
-    <a class="tmux-tab" data-target="path" href="#path"><b>4</b>path</a>
-    <a class="tmux-tab" data-target="contact" href="#contact"><b>5</b>contact</a>
+    <a class="tmux-tab" data-target="playground" href="#playground"><b>3</b>play</a>
+    <a class="tmux-tab" data-target="projects" href="#projects"><b>4</b>work</a>
+    <a class="tmux-tab" data-target="path" href="#path"><b>5</b>path</a>
+    <a class="tmux-tab" data-target="contact" href="#contact"><b>6</b>contact</a>
   </div>
 </nav>
 
@@ -486,8 +689,8 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
   },{threshold:.12});
   document.querySelectorAll('.fade').forEach(function(el){ obs.observe(el); });
 
-  /* ---------- active-section tracking for tmux bar + top nav ---------- */
-  var sectionIds = ['hero','about','skills','projects','path','contact'];
+  /* ---------- active-section tracking ---------- */
+  var sectionIds = ['hero','about','skills','playground','projects','path','contact'];
   var tabs = document.querySelectorAll('.tmux-tab');
   var topLinks = document.querySelectorAll('.topbar nav a');
   var secObs = new IntersectionObserver(function(entries){
@@ -514,6 +717,200 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
       if(upEl) upEl.textContent = mm+':'+ss;
     },1000);
   }
+
+  /* ---------- resume download (print) ---------- */
+  function triggerPrint(){ window.print(); }
+  var rb1 = document.getElementById('resumeBtn');
+  var rb2 = document.getElementById('resumeBtn2');
+  if(rb1) rb1.addEventListener('click', triggerPrint);
+  if(rb2) rb2.addEventListener('click', triggerPrint);
+
+  /* ---------- custom cursor accent ---------- */
+  if(window.matchMedia('(hover:hover) and (pointer:fine)').matches){
+    var dot = document.getElementById('cursorDot');
+    var tx=0, ty=0, cx=0, cy=0, shown=false;
+    document.addEventListener('mousemove', function(e){
+      tx=e.clientX; ty=e.clientY;
+      if(!shown){ dot.classList.add('show'); shown=true; }
+      var el = document.elementFromPoint(e.clientX,e.clientY);
+      var clickable = el && el.closest('a,button,.viz-btn');
+      dot.classList.toggle('pointer', !!clickable);
+    });
+    document.addEventListener('mouseleave', function(){ dot.classList.remove('show'); shown=false; });
+    (function raf(){
+      cx += (tx-cx)*0.25; cy += (ty-cy)*0.25;
+      dot.style.left = cx+'px'; dot.style.top = cy+'px';
+      requestAnimationFrame(raf);
+    })();
+  }
+
+  /* ---------- hero particle field ---------- */
+  (function(){
+    var canvas = document.getElementById('heroCanvas');
+    if(!canvas || reduceMotion) return;
+    var ctx = canvas.getContext('2d');
+    var w,h,particles=[],dpr=Math.min(window.devicePixelRatio||1,2);
+    function resize(){
+      w = canvas.width = canvas.offsetWidth * dpr;
+      h = canvas.height = canvas.offsetHeight * dpr;
+    }
+    function init(){
+      resize();
+      particles = [];
+      var count = Math.max(20, Math.min(55, Math.floor((w*h)/70000)));
+      for(var k=0;k<count;k++){
+        particles.push({
+          x: Math.random()*w, y: Math.random()*h,
+          r: (Math.random()*1.3+0.4)*dpr,
+          vy: (Math.random()*0.18+0.05)*dpr,
+          a: Math.random()*0.45+0.12
+        });
+      }
+    }
+    var running = true;
+    document.addEventListener('visibilitychange', function(){ running = !document.hidden; });
+    function tick(){
+      if(running && w && h){
+        ctx.clearRect(0,0,w,h);
+        ctx.fillStyle = '#ffb300';
+        particles.forEach(function(p){
+          p.y -= p.vy;
+          if(p.y < -5) p.y = h+5;
+          ctx.globalAlpha = p.a;
+          ctx.beginPath();
+          ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+          ctx.fill();
+        });
+        ctx.globalAlpha = 1;
+      }
+      requestAnimationFrame(tick);
+    }
+    window.addEventListener('resize', init);
+    init();
+    requestAnimationFrame(tick);
+  })();
+
+  /* ---------- sorting visualizer ---------- */
+  (function(){
+    var canvas = document.getElementById('vizCanvas');
+    if(!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var dpr = Math.min(window.devicePixelRatio||1,2);
+    var N = 26, arr = [], W, H;
+    var running = false, compares = 0;
+    var statusEl = document.getElementById('vizStatus');
+    var comparesEl = document.getElementById('vizCompares');
+    var algoBtns = document.querySelectorAll('.viz-btn[data-algo]');
+    var shuffleBtn = document.getElementById('vizShuffle');
+    var runBtn = document.getElementById('vizRun');
+    var currentAlgo = 'bubble';
+
+    function resizeCanvas(){
+      W = canvas.offsetWidth; H = canvas.offsetHeight || 220;
+      canvas.width = W*dpr; canvas.height = H*dpr;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    function shuffle(){
+      arr = [];
+      for(var k=0;k<N;k++) arr.push(Math.random()*0.85+0.08);
+      draw(arr,[],[]);
+      compares = 0;
+      comparesEl.textContent = 'comparisons: 0';
+      statusEl.textContent = 'ready';
+    }
+    function draw(state, compareIdx, swapIdx){
+      resizeCanvas();
+      ctx.clearRect(0,0,W,H);
+      var gap = 3, bw = (W - gap*(state.length-1))/state.length;
+      for(var k=0;k<state.length;k++){
+        var bh = state[k]*(H-10);
+        var x = k*(bw+gap), y = H-bh;
+        if(swapIdx && (k===swapIdx[0]||k===swapIdx[1])) ctx.fillStyle = '#ffc233';
+        else if(compareIdx && (k===compareIdx[0]||k===compareIdx[1])) ctx.fillStyle = '#ffe08a';
+        else ctx.fillStyle = '#8a5c00';
+        ctx.fillRect(x,y,bw,bh);
+      }
+    }
+    window.addEventListener('resize', function(){ draw(arr,[],[]); });
+
+    function* bubbleSort(a){
+      var n=a.length;
+      for(var x=0;x<n-1;x++){
+        for(var j=0;j<n-x-1;j++){
+          yield {arr:a.slice(), compare:[j,j+1]};
+          if(a[j]>a[j+1]){ var t=a[j]; a[j]=a[j+1]; a[j+1]=t; yield {arr:a.slice(), swap:[j,j+1]}; }
+        }
+      }
+    }
+    function* selectionSort(a){
+      var n=a.length;
+      for(var x=0;x<n-1;x++){
+        var min=x;
+        for(var j=x+1;j<n;j++){
+          yield {arr:a.slice(), compare:[min,j]};
+          if(a[j]<a[min]) min=j;
+        }
+        if(min!==x){ var t=a[x]; a[x]=a[min]; a[min]=t; yield {arr:a.slice(), swap:[x,min]}; }
+      }
+    }
+    function* quickSort(a, lo, hi){
+      lo = lo===undefined?0:lo; hi = hi===undefined?a.length-1:hi;
+      if(lo<hi){
+        var p=a[hi], idx=lo-1;
+        for(var j=lo;j<hi;j++){
+          yield {arr:a.slice(), compare:[j,hi]};
+          if(a[j]<p){ idx++; var t=a[idx]; a[idx]=a[j]; a[j]=t; yield {arr:a.slice(), swap:[idx,j]}; }
+        }
+        var t2=a[idx+1]; a[idx+1]=a[hi]; a[hi]=t2;
+        yield {arr:a.slice(), swap:[idx+1,hi]};
+        var pivot=idx+1;
+        yield* quickSort(a, lo, pivot-1);
+        yield* quickSort(a, pivot+1, hi);
+      }
+    }
+
+    algoBtns.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        if(running) return;
+        algoBtns.forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        currentAlgo = btn.dataset.algo;
+      });
+    });
+    shuffleBtn.addEventListener('click', function(){ if(!running) shuffle(); });
+
+    runBtn.addEventListener('click', function(){
+      if(running) return;
+      running = true;
+      runBtn.disabled = true; shuffleBtn.disabled = true;
+      algoBtns.forEach(function(b){ b.disabled = true; });
+      statusEl.textContent = 'running';
+      var gen = currentAlgo==='bubble' ? bubbleSort(arr.slice())
+              : currentAlgo==='selection' ? selectionSort(arr.slice())
+              : quickSort(arr.slice());
+      var delay = reduceMotion ? 4 : 28;
+      function step(){
+        var res = gen.next();
+        if(res.done){
+          arr = arr.slice().sort(function(a,b){return a-b;});
+          draw(arr,[],[]);
+          running=false; statusEl.textContent='sorted';
+          runBtn.disabled=false; shuffleBtn.disabled=false;
+          algoBtns.forEach(function(b){ b.disabled=false; });
+          return;
+        }
+        var val = res.value;
+        arr = val.arr;
+        if(val.compare) compares++;
+        comparesEl.textContent = 'comparisons: '+compares;
+        draw(val.arr, val.compare, val.swap);
+        setTimeout(step, delay);
+      }
+      step();
+    });
+
+    shuffle();
+  })();
 
   /* ---------- projects, pulled from GitHub ---------- */
   var FALLBACK_PROJECTS = [
@@ -610,8 +1007,6 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
     });
   }
 
-  // Render immediately so the section is never empty, then try to refresh
-  // with live GitHub data in case any repo details have changed since.
   renderProjects(FALLBACK_PROJECTS);
   fetch('https://api.github.com/users/Savindudam/repos?per_page=100')
     .then(function(r){ return r.ok ? r.json() : null; })
