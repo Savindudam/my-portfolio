@@ -19,9 +19,9 @@
   --ink:#edf2e8;
   --ink-dim:#9aa694;
   --ink-faint:#59614f;
-  --amber:#ffb300;
-  --amber-dim:#8a5c00;
-  --amber-wash:rgba(255,179,0,.08);
+  --amber:#38e07a;
+  --amber-dim:#1c7a44;
+  --amber-wash:rgba(56,224,122,.08);
   --mono:'JetBrains Mono',ui-monospace,monospace;
   --sans:'IBM Plex Sans',system-ui,sans-serif;
   --bar-h:52px;
@@ -58,18 +58,6 @@ a{color:inherit}
 .skip-link:focus{left:1rem;top:1rem}
 
 :focus-visible{outline:2px solid var(--amber);outline-offset:3px}
-
-/* ============ CUSTOM CURSOR ACCENT ============ */
-#cursorDot{
-  position:fixed;top:0;left:0;width:18px;height:18px;
-  border:1px solid var(--amber);border-radius:3px;
-  pointer-events:none;z-index:300;
-  transform:translate(-50%,-50%);
-  opacity:0;transition:opacity .25s ease,width .15s,height .15s,border-radius .15s;
-}
-#cursorDot.show{opacity:.85}
-#cursorDot.pointer{width:10px;height:10px;border-radius:50%;background:var(--amber);border-color:transparent}
-@media(hover:none),(pointer:coarse){ #cursorDot{display:none} }
 
 /* ============ TOP BAR (desktop nav) ============ */
 .topbar{
@@ -129,14 +117,19 @@ section{
 .term-body{padding:1.6rem}
 @media(max-width:600px){ .term-body{padding:1.1rem} }
 
+/* ============ GLOBAL MOVING BACKGROUND (digital rain) ============ */
+#matrixCanvas{
+  position:fixed;inset:0;width:100%;height:100%;
+  z-index:-1;opacity:.6;pointer-events:none;
+}
+
 /* ============ HERO ============ */
 #hero{
   min-height:100svh;display:flex;flex-direction:column;justify-content:center;
   padding-top:calc(6rem + 1.5rem);
   border-bottom:1px solid var(--rule-soft);
-  position:relative;overflow:hidden;
+  position:relative;
 }
-#heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.55;pointer-events:none}
 #hero .wrap{position:relative;z-index:1}
 .boot-log{
   font-family:var(--mono);font-size:.72rem;color:var(--ink-faint);
@@ -173,7 +166,7 @@ section{
 }
 .hlink:hover{border-color:var(--amber);color:var(--amber)}
 .hlink.primary{background:var(--amber);color:#100c00;border-color:var(--amber);font-weight:700}
-.hlink.primary:hover{background:#ffc233;color:#100c00}
+.hlink.primary:hover{background:#5cf0a0;color:#100c00}
 
 /* ============ ABOUT ============ */
 .about-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:clamp(2rem,5vw,4rem)}
@@ -187,7 +180,6 @@ section{
 }
 .stat span:first-child{color:var(--ink-faint)}
 .stat span:last-child{color:var(--ink);text-align:right}
-.resume-btn-wrap{margin-top:1.3rem}
 
 /* ============ GITHUB STATS ============ */
 .stats-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:1.1rem}
@@ -213,7 +205,7 @@ section{
 .viz-btn:hover{border-color:var(--amber-dim);color:var(--ink)}
 .viz-btn.active{border-color:var(--amber);color:var(--amber);background:var(--amber-wash)}
 .viz-btn.primary{background:var(--amber);color:#100c00;border-color:var(--amber);font-weight:700}
-.viz-btn.primary:hover{background:#ffc233;color:#100c00}
+.viz-btn.primary:hover{background:#5cf0a0;color:#100c00}
 .viz-btn:disabled{opacity:.4;cursor:not-allowed}
 #vizCanvas{width:100%;height:220px;display:block;background:var(--bg-soft);border-radius:6px;border:1px solid var(--rule-soft)}
 .viz-meta{display:flex;justify-content:space-between;margin-top:.7rem;font-family:var(--mono);font-size:.66rem;color:var(--ink-faint)}
@@ -341,29 +333,12 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
   .fade{opacity:1;transform:none;transition:none}
   .hero-name,.hero-role,.hero-bio,.hero-links{opacity:1 !important;animation:none !important;transition:none !important}
 }
-
-/* ============ PRINT RESUME ============ */
-.only-print{display:none}
-@media print{
-  body::before,#cursorDot,.topbar,.tmux-bar,footer,#heroCanvas{display:none !important}
-  main > section{display:none !important}
-  body{padding-bottom:0;background:#fff;color:#111}
-  .only-print{
-    display:block !important;color:#111;font-family:var(--sans);padding:0 1cm;
-  }
-  .only-print h1{font-family:var(--mono);font-size:22pt;margin-bottom:.2cm}
-  .only-print h2{font-family:var(--mono);font-size:11pt;text-transform:uppercase;letter-spacing:1px;
-    margin:.7cm 0 .25cm;border-bottom:1px solid #ccc;padding-bottom:.1cm;color:#333}
-  .only-print p,.only-print li{font-size:10.5pt;line-height:1.5;color:#222}
-  .only-print .print-tagline{font-family:var(--mono);color:#555;margin-bottom:.15cm}
-  .only-print ul{padding-left:1.1em;margin-bottom:.3cm}
-}
 </style>
 </head>
 <body>
 
 <a class="skip-link" href="#main">Skip to content</a>
-<div id="cursorDot" aria-hidden="true"></div>
+<canvas id="matrixCanvas" aria-hidden="true"></canvas>
 
 <header class="topbar">
   <a class="logo" href="#hero">&lt;<b>SD</b> /&gt;</a>
@@ -380,15 +355,14 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
 <main id="main">
 
   <section id="hero">
-    <canvas id="heroCanvas" aria-hidden="true"></canvas>
     <div class="wrap" style="max-width:900px;margin:0">
       <div class="boot-log" id="bootLog" aria-hidden="true"></div>
       <h1 class="hero-name" id="heroName">Savindu <span class="amber">Damsara</span><span class="cursor"></span></h1>
-      <p class="hero-role" id="heroRole">Competitive Programmer &middot; Aspiring Security Researcher</p>
+      <p class="hero-role" id="heroRole">2025 National IOI Team &middot; Now Learning Security &amp; Hacking</p>
       <p class="hero-bio" id="heroBio">
-        I write <strong>Python, C++, and Bash</strong> because I genuinely can't stop. Right now I'm splitting my time between
-        <span class="accent">IOI-track algorithms</span> and <span class="accent">CTF &amp; security fundamentals</span> &mdash;
-        two different ways of asking the same question: how does this actually work, and how does it break.
+        I came up through competitive programming and made <strong>Sri Lanka's 2025 National IOI Team</strong>. These days
+        most of my energy goes into <span class="accent">cybersecurity and hacking</span>, with algorithms as the track I keep
+        sharp on the side &mdash; all of it alongside <strong>Advanced Levels in Maths, Physics, and ICT</strong>.
       </p>
       <div class="hero-links" id="heroLinks">
         <a href="#projects" class="hlink primary">View Projects</a>
@@ -403,20 +377,17 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
       <div class="eyebrow">about.md</div>
       <div class="about-grid">
         <div class="about-copy fade">
-          <p>I'm Savindu, a coder from Sri Lanka who started out of pure curiosity and never really stopped. I didn't follow a roadmap &mdash; I just kept poking at things until they made sense.</p>
-          <p>Most of my time goes into <strong>Python, C++, and Bash</strong>. Python is where I'm comfortable. C++ is where I'm pushing hardest right now, mostly through competitive programming. Bash is what I reach for the moment I catch myself doing something twice.</p>
-          <p>I run most of my dev work out of <strong>Termux</strong> &mdash; a full environment off a phone. Working inside that kind of constraint forces you to actually understand your tools instead of leaning on defaults.</p>
-          <p>Lately that curiosity has pointed toward <span class="amber-text">cybersecurity</span>. Not as a label, just because understanding how systems fail is the most honest way to understand how they work.</p>
-          <div class="resume-btn-wrap no-print">
-            <button class="hlink" id="resumeBtn" type="button">Download Resume (PDF)</button>
-          </div>
+          <p>I'm Savindu, a coder from Sri Lanka. I came up through competitive programming and was selected for <strong>Sri Lanka's 2025 National IOI Team</strong> &mdash; that track taught me how to think in algorithms.</p>
+          <p>I built my early stuff in <strong>HTML, CSS, and JavaScript</strong>, then moved into <strong>C++, Python, and Bash</strong>, which is what I work in day to day now.</p>
+          <p>My setup is split: <strong>iSH</strong> on an iPhone 11 for a terminal on the go, and <strong>Kali Linux</strong> on my laptop for actual security work.</p>
+          <p>Right now I'm doing my <strong>Advanced Levels (Maths, Physics, ICT)</strong>, and most of my free time outside that goes into <span class="amber-text">cybersecurity and hacking</span> &mdash; algorithms stay in the mix, just at a lower dose than before.</p>
         </div>
         <div class="fade">
-          <div class="stat"><span>Focus</span><span>Algorithms &amp; Security</span></div>
-          <div class="stat"><span>Daily driver</span><span>Termux / Linux</span></div>
-          <div class="stat"><span>Languages</span><span>Python, C/C++, Bash</span></div>
-          <div class="stat"><span>Currently</span><span>IOI prep + CTF basics</span></div>
-          <div class="stat"><span>Status</span><span style="color:var(--amber)">Building daily</span></div>
+          <div class="stat"><span>Achievement</span><span>2025 National IOI Team</span></div>
+          <div class="stat"><span>Focus now</span><span>Security &amp; hacking</span></div>
+          <div class="stat"><span>Daily driver</span><span>iSH (iPhone 11) / Kali Linux</span></div>
+          <div class="stat"><span>Languages</span><span>C++, Python, Bash</span></div>
+          <div class="stat"><span>Time split</span><span style="color:var(--amber)">~50% AL &middot; 35&ndash;40% Security &middot; 10&ndash;15% Algo</span></div>
         </div>
       </div>
     </div>
@@ -432,7 +403,7 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
             <span class="term-path">~/savindu $ cat contributions.svg</span>
           </div>
           <div class="term-body">
-            <img src="https://ghchart.rshah.org/ffb300/Savindudam" alt="Savindu Damsara's GitHub contribution graph" loading="lazy">
+            <img src="https://ghchart.rshah.org/38e07a/Savindudam" alt="Savindu Damsara's GitHub contribution graph" loading="lazy">
           </div>
         </div>
         <div class="term fade">
@@ -441,7 +412,7 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
             <span class="term-path">~/savindu $ cat stats.json</span>
           </div>
           <div class="term-body">
-            <img src="https://github-readme-stats.vercel.app/api?username=Savindudam&show_icons=true&hide_border=true&bg_color=00000000&title_color=ffb300&text_color=9aa694&icon_color=ffb300" alt="Savindu Damsara's GitHub stats card" loading="lazy">
+            <img src="https://github-readme-stats.vercel.app/api?username=Savindudam&show_icons=true&hide_border=true&bg_color=00000000&title_color=38e07a&text_color=9aa694&icon_color=38e07a" alt="Savindu Damsara's GitHub stats card" loading="lazy">
           </div>
         </div>
       </div>
@@ -457,15 +428,15 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
           <span class="term-path">~/<span class="amber">savindu</span> $ tree skills/</span>
         </div>
         <div class="term-body">
-<div class="tree" role="img" aria-label="Skill tree: Languages - Python, C and C++, Bash, HTML and JS. Security and Systems - Linux, Termux, cryptography basics, CTF fundamentals. Tools - Git and GitHub, Codeforces, Scratch, shell scripting.">skills/
+<div class="tree" role="img" aria-label="Skill tree: Languages - C++, Python, Bash currently, HTML CSS and JS as foundations. Security and Systems - Kali Linux, iSH on iPhone, cryptography basics, CTF fundamentals. Tools - Git and GitHub, Codeforces, Scratch, shell scripting.">skills/
 ├── <span class="dir">languages/</span>
-│   ├── <span class="leaf">python</span>
-│   ├── <span class="leaf">c / c++</span>
-│   ├── <span class="leaf">bash</span>
-│   └── <span class="leaf">html / js</span>
+│   ├── <span class="leaf">c++</span>          <span class="comment"># current</span>
+│   ├── <span class="leaf">python</span>       <span class="comment"># current</span>
+│   ├── <span class="leaf">bash</span>         <span class="comment"># current</span>
+│   └── <span class="leaf">html / css / js</span>  <span class="comment"># foundations</span>
 ├── <span class="dir">security-systems/</span>
-│   ├── <span class="leaf">linux</span>
-│   ├── <span class="leaf">termux</span>
+│   ├── <span class="leaf">kali linux</span>   <span class="comment"># laptop</span>
+│   ├── <span class="leaf">ish shell</span>    <span class="comment"># iphone 11</span>
 │   ├── <span class="leaf">cryptography basics</span>
 │   └── <span class="leaf">ctf fundamentals</span>
 └── <span class="dir">tools/</span>
@@ -548,28 +519,28 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
 
   <section id="path">
     <div class="wrap">
-      <div class="eyebrow">path.log — two tracks, running in parallel</div>
+      <div class="eyebrow">path.log — two tracks, weighted toward security right now</div>
       <div class="path-grid fade">
         <div class="path-col">
-          <h3>Algorithms</h3>
-          <div class="sub">IOI track</div>
-          <ol>
-            <li>C++ fundamentals, recursion, and complexity</li>
-            <li>STL core &mdash; vectors, sets, maps, heaps</li>
-            <li>Greedy, binary search, dynamic programming</li>
-            <li>Graphs, trees, and advanced data structures</li>
-            <li>Weekly timed mocks on Codeforces / CSES</li>
-          </ol>
-        </div>
-        <div class="path-col">
           <h3>Security</h3>
-          <div class="sub">CTF / ethical hacking track</div>
+          <div class="sub">Primary focus — CTF / ethical hacking</div>
           <ol>
             <li>Linux fundamentals and core networking</li>
             <li>picoCTF &mdash; general skills, web, crypto</li>
             <li>Forensics and early binary exploitation</li>
             <li>Python scripting for security automation</li>
             <li>Live CTF competitions via ctftime.org</li>
+          </ol>
+        </div>
+        <div class="path-col">
+          <h3>Algorithms</h3>
+          <div class="sub">Maintenance track — IOI-level</div>
+          <ol>
+            <li>C++ fundamentals, recursion, and complexity</li>
+            <li>STL core &mdash; vectors, sets, maps, heaps</li>
+            <li>Greedy, binary search, dynamic programming</li>
+            <li>Graphs, trees, and advanced data structures</li>
+            <li>Staying sharp with Codeforces / CSES</li>
           </ol>
         </div>
       </div>
@@ -584,7 +555,6 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
           <div class="prompt-line"><span class="amber">savindu@sri-lanka</span>:~$ echo $REASON_TO_REACH_OUT</div>
           <div class="connect-lead">Always up for talking <span class="amber">code</span>, swapping ideas, or building something together.</div>
           <p class="connect-sub">Don't overthink it &mdash; just reach out. I'm on GitHub and Instagram, either works.</p>
-          <button class="hlink" id="resumeBtn2" type="button">Download Resume (PDF)</button>
         </div>
         <div class="slinks fade">
           <a class="slink" href="https://github.com/Savindudam" target="_blank" rel="noopener">
@@ -601,29 +571,6 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
   </section>
 
 </main>
-
-<div class="only-print" id="printResume">
-  <h1>Savindu Damsara</h1>
-  <p class="print-tagline">Competitive Programmer · Aspiring Security Researcher</p>
-  <p>github.com/Savindudam &nbsp;·&nbsp; instagram.com/dreamxhava_2</p>
-  <h2>Summary</h2>
-  <p>Self-taught coder from Sri Lanka working across two tracks: competitive programming on the IOI path, and foundational cybersecurity through CTF practice. Builds small, complete tools rather than waiting for a perfect plan — daily driver is Termux on a phone.</p>
-  <h2>Focus Areas</h2>
-  <ul>
-    <li>Algorithms — IOI track, Codeforces and CSES practice, STL, DP, graphs</li>
-    <li>Security — Linux fundamentals, Termux, CTF basics, cryptography fundamentals</li>
-  </ul>
-  <h2>Skills</h2>
-  <p>Python, C / C++, Bash, HTML / JS, Linux, Termux, Git / GitHub, Codeforces, shell scripting.</p>
-  <h2>Selected Projects</h2>
-  <ul>
-    <li><strong>Encrypt---Decrypt</strong> — five-method cipher toolkit (Caesar, Vigenère, ROT13, XOR, Base64) — github.com/Savindudam/Encrypt---Decrypt</li>
-    <li><strong>cp-blog</strong> — competitive-programming notes and write-ups — cp-blog-eight.vercel.app</li>
-    <li><strong>Competitive_Programming</strong> — archive of solved problems and templates — competitive-programming-mu.vercel.app</li>
-    <li><strong>Friend_To_Friend</strong> — encrypted message-sharing tool — friend-to-friend.vercel.app</li>
-    <li><strong>Termux-main-package-installer</strong> — automated Termux environment setup</li>
-  </ul>
-</div>
 
 <footer>
   <span>&copy; 2026 Savindu Damsara</span>
@@ -652,7 +599,7 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
     ["$ whoami", null],
     ["> loading profile...", "ok"],
     ["> stack: python, c++, bash", "ok"],
-    ["> tracks: ioi-algorithms, ctf-security", "ok"],
+    ["> tracks: ctf-security, ioi-algorithms", "ok"],
     ["> status: ready", "ok"]
   ];
   var log = document.getElementById('bootLog');
@@ -718,76 +665,43 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
     },1000);
   }
 
-  /* ---------- resume download (print) ---------- */
-  function triggerPrint(){ window.print(); }
-  var rb1 = document.getElementById('resumeBtn');
-  var rb2 = document.getElementById('resumeBtn2');
-  if(rb1) rb1.addEventListener('click', triggerPrint);
-  if(rb2) rb2.addEventListener('click', triggerPrint);
-
-  /* ---------- custom cursor accent ---------- */
-  if(window.matchMedia('(hover:hover) and (pointer:fine)').matches){
-    var dot = document.getElementById('cursorDot');
-    var tx=0, ty=0, cx=0, cy=0, shown=false;
-    document.addEventListener('mousemove', function(e){
-      tx=e.clientX; ty=e.clientY;
-      if(!shown){ dot.classList.add('show'); shown=true; }
-      var el = document.elementFromPoint(e.clientX,e.clientY);
-      var clickable = el && el.closest('a,button,.viz-btn');
-      dot.classList.toggle('pointer', !!clickable);
-    });
-    document.addEventListener('mouseleave', function(){ dot.classList.remove('show'); shown=false; });
-    (function raf(){
-      cx += (tx-cx)*0.25; cy += (ty-cy)*0.25;
-      dot.style.left = cx+'px'; dot.style.top = cy+'px';
-      requestAnimationFrame(raf);
-    })();
-  }
-
-  /* ---------- hero particle field ---------- */
+  /* ---------- global digital-rain background ---------- */
   (function(){
-    var canvas = document.getElementById('heroCanvas');
-    if(!canvas || reduceMotion) return;
+    var canvas = document.getElementById('matrixCanvas');
+    if(!canvas) return;
+    if(reduceMotion){ canvas.remove(); return; }
     var ctx = canvas.getContext('2d');
-    var w,h,particles=[],dpr=Math.min(window.devicePixelRatio||1,2);
+    var fontSize = 15, columns, drops, w, h;
+    var chars = "01{}<>/;:=+*#$%&ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     function resize(){
-      w = canvas.width = canvas.offsetWidth * dpr;
-      h = canvas.height = canvas.offsetHeight * dpr;
-    }
-    function init(){
-      resize();
-      particles = [];
-      var count = Math.max(20, Math.min(55, Math.floor((w*h)/70000)));
-      for(var k=0;k<count;k++){
-        particles.push({
-          x: Math.random()*w, y: Math.random()*h,
-          r: (Math.random()*1.3+0.4)*dpr,
-          vy: (Math.random()*0.18+0.05)*dpr,
-          a: Math.random()*0.45+0.12
-        });
-      }
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+      columns = Math.floor(w / fontSize);
+      drops = [];
+      for(var i=0;i<columns;i++) drops[i] = Math.random()*-100;
     }
     var running = true;
     document.addEventListener('visibilitychange', function(){ running = !document.hidden; });
     function tick(){
-      if(running && w && h){
-        ctx.clearRect(0,0,w,h);
-        ctx.fillStyle = '#ffb300';
-        particles.forEach(function(p){
-          p.y -= p.vy;
-          if(p.y < -5) p.y = h+5;
-          ctx.globalAlpha = p.a;
-          ctx.beginPath();
-          ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-          ctx.fill();
-        });
-        ctx.globalAlpha = 1;
+      if(running){
+        ctx.fillStyle = 'rgba(10,13,10,0.09)';
+        ctx.fillRect(0,0,w,h);
+        ctx.font = fontSize+'px "JetBrains Mono", monospace';
+        for(var i=0;i<columns;i++){
+          var ch = chars[Math.floor(Math.random()*chars.length)];
+          var y = drops[i]*fontSize;
+          ctx.fillStyle = Math.random() < 0.06 ? '#c9ffe0' : '#38e07a';
+          ctx.globalAlpha = Math.random()*0.5 + 0.4;
+          ctx.fillText(ch, i*fontSize, y);
+          ctx.globalAlpha = 1;
+          if(y > h && Math.random() > 0.975) drops[i] = 0;
+          drops[i]++;
+        }
       }
-      requestAnimationFrame(tick);
     }
-    window.addEventListener('resize', init);
-    init();
-    requestAnimationFrame(tick);
+    window.addEventListener('resize', resize);
+    resize();
+    setInterval(tick, 45);
   })();
 
   /* ---------- sorting visualizer ---------- */
@@ -825,9 +739,9 @@ footer{padding:1.6rem clamp(1.2rem,5vw,3rem);display:flex;justify-content:space-
       for(var k=0;k<state.length;k++){
         var bh = state[k]*(H-10);
         var x = k*(bw+gap), y = H-bh;
-        if(swapIdx && (k===swapIdx[0]||k===swapIdx[1])) ctx.fillStyle = '#ffc233';
-        else if(compareIdx && (k===compareIdx[0]||k===compareIdx[1])) ctx.fillStyle = '#ffe08a';
-        else ctx.fillStyle = '#8a5c00';
+        if(swapIdx && (k===swapIdx[0]||k===swapIdx[1])) ctx.fillStyle = '#c9ffe0';
+        else if(compareIdx && (k===compareIdx[0]||k===compareIdx[1])) ctx.fillStyle = '#38e07a';
+        else ctx.fillStyle = '#1c7a44';
         ctx.fillRect(x,y,bw,bh);
       }
     }
